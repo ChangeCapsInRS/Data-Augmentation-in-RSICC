@@ -1,0 +1,14 @@
+language_tool_python==2.7.1
+pydantic==2.6.2
+tqdm==4.66.3
+opencv-python==4.9.0.80
+termcolor==2.4.0
+python-dotenv==1.0.1
+google-generativeai
+pillow==10.3.0
+torch
+torchvision
+nltk
+transformers
+streamlit
+pytest
