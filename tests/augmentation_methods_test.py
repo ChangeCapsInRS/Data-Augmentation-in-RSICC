@@ -34,10 +34,12 @@ def load_image(image_path: str) -> cv.typing.MatLike:
 class BaselineImageLoader:
     def __init__(self, path_to_folder_containing_baseline_images: str) -> None:
         """
-        Initialize the BaselineImageLoader with the path to the folder containing the baseline images.
+        Initialize the BaselineImageLoader with the path to the folder
+        containing the baseline images.
 
         Args:
-            path_to_folder_containing_baseline_images (str): The path to the folder containing the baseline images.
+            path_to_folder_containing_baseline_images (str): The path to the\
+                folder containing the baseline images.
         """
         self.baseline_images_folder_path = (
             path_to_folder_containing_baseline_images
@@ -238,12 +240,14 @@ def augment_single_image_and_check_before_and_after_results(
     expected_image: cv.typing.MatLike,
 ) -> None:
     """
-    Augment a single image using the given augmentation method and check if the before and after images are as expected.
+    Augment a single image using the given augmentation method and check if
+    the before and after images are as expected.
 
     Args:
         aug_method (Callable): The augmentation method to apply.
         base_image (cv.typing.MatLike): The base image to augment.
-        expected_image (cv.typing.MatLike): The expected image after augmentation.
+        expected_image (cv.typing.MatLike): The expected image after\
+            augmentation.
 
     Raises:
         AssertionError: If the before and after images are not as expected.
