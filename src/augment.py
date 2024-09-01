@@ -24,16 +24,13 @@ def get_inputs(
     images_directory_name: str,
     json_path: str,
     splits: set[str],
-    levircc: bool = False,
 ):
     captions = Captions.load(json_path)
 
     vocab, _ = captions.get_vocabulary()
 
     # convert model to image pairs and captions
-    pydantic_pairs = captions.to_ImagePairs(
-        images_directory_name, splits, levircc=levircc
-    )
+    pydantic_pairs = captions.to_ImagePairs(images_directory_name, splits)
 
     return pydantic_pairs, vocab
 
@@ -135,7 +132,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         args.images_directory,
         args.json_path,
         set(args.split),
-        levircc=args.levircc,
     )
 
     print(f"Augmenting images and captions using {args.augmenter_names}...")
@@ -148,7 +144,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             output_path=args.output_folder,
             overwrite=args.overwrite,
             make_dirs=args.make_directories,
-            dataset="LevirCC" if args.levircc else "SecondCC",
         )
 
     # copy original files to output folder

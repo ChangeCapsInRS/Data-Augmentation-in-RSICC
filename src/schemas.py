@@ -197,7 +197,6 @@ class Captions(BaseModel):
         self,
         images_path: str,
         splits: set[str] = {"train", "val"},
-        levircc=False,
     ) -> "ImagePairs":
         """
         Converts the captions to a list of pairs of images with intents.
@@ -217,12 +216,11 @@ class Captions(BaseModel):
             split in {"train", "val", "test"} for split in splits
         ), "The splits must be 'train', 'val', or 'test'"
 
-        # print("levircc", levircc)
         results = []
         for intent in self.images:
             if intent.split in splits:
                 imgA, imgB = Image.load_pair_of_images(
-                    images_path, intent.filename, intent.split, levircc
+                    images_path, intent.filename, intent.split
                 )
                 results.append(
                     ImagePairWithIntent(imgA=imgA, imgB=imgB, intent=intent)
@@ -337,7 +335,6 @@ class Image(BaseModel):
         base_path: str,
         filename: str,
         split: Literal["test", "train", "val"],
-        levircc=False,
     ) -> tuple["Image", "Image"]:
         """
         Reads a pair of images from the given base path.
@@ -350,9 +347,8 @@ class Image(BaseModel):
         Returns:
             tuple[Image, Image]: A tuple containing the pair of images.
         """
-        # print("levircc", levircc)
         imageA_path, imageB_path = Image.get_paths_for_pair_of_images(
-            base_path, split, filename, levircc
+            base_path, split, filename
         )
         imgA = cv2.imread(imageA_path)
         imgB = cv2.imread(imageB_path)
@@ -370,7 +366,6 @@ class Image(BaseModel):
         *,
         overwrite: bool = False,
         make_dirs: bool = True,
-        dataset: Literal["LevirCC", "SecondCC"] = "SecondCC",
     ):
         """
         Writes a pair of images to the given base path.
@@ -386,7 +381,7 @@ class Image(BaseModel):
                 exist. Defaults to True.
         """
         imageA_path, imageB_path = Image.get_paths_for_pair_of_images(
-            base_path, split, imageA.filename, levircc=(dataset == "LevirCC")
+            base_path, split, imageA.filename
         )
 
         if make_dirs:
@@ -409,7 +404,6 @@ class Image(BaseModel):
         base_path: str,
         split: Literal["test", "train", "val"],
         filename: str,
-        levircc=False,
     ) -> tuple[str, str]:
         """
         Returns the path of the image.
@@ -422,17 +416,10 @@ class Image(BaseModel):
         Returns:
             tuple[str, str]: A tuple containing the paths of the images.
         """
-        # print("levircc", levircc)
-        if not levircc:
-            return (
-                os.path.join(base_path, split, "A", f"{split}_{filename}"),
-                os.path.join(base_path, split, "B", f"{split}_{filename}"),
-            )
-        else:
-            return (
-                os.path.join(base_path, split, "A", f"{filename}"),
-                os.path.join(base_path, split, "B", f"{filename}"),
-            )
+        return (
+            os.path.join(base_path, split, "A", f"{filename}"),
+            os.path.join(base_path, split, "B", f"{filename}"),
+        )
 
 
 class ImagePairWithIntent(BaseModel):
@@ -651,7 +638,6 @@ class AugmentedImagePairs(ImagePairs):
         *,
         overwrite: bool = False,
         make_dirs: bool = True,
-        dataset: Literal["LevirCC", "SecondCC"] = "SecondCC",
     ):
         """
         Saves the augmented image pairs to the given output path.
@@ -707,7 +693,6 @@ class AugmentedImagePairs(ImagePairs):
                 pair.split,
                 pair.imgA,
                 pair.imgB,
-                dataset=dataset,
                 overwrite=overwrite,
                 make_dirs=make_dirs,
             )
