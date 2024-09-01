@@ -58,7 +58,8 @@ class Sentence(BaseModel):
         """
         Sets the tokens as the split raw string.
         """
-        # normalize the raw sentence and set the tokens as the split raw sentence
+        # normalize the raw sentence and set the tokens as the split raw
+        # sentence
         raw_sentence = normalize_sentence(v["raw"])
         v["tokens"] = [word for word in raw_sentence.split() if word.isalnum()]
         return v
@@ -151,7 +152,8 @@ class Intent(BaseModel):
         ), "The sentids of the sentences must be the same as the intent"
         return self
 
-    # ? This assumes the filepath is the same as the split (which is what we see in the data)
+    # ? This assumes the filepath is the same as the split
+    # (which is what we see in the data)
     @model_validator(mode="after")
     def filepath_must_be_same_as_split(self) -> Self:
         """
@@ -192,9 +194,10 @@ class Captions(BaseModel):
         duplicate_filenames = {
             filename for filename in filenames if filenames.count(filename) > 1
         }
-        assert (
-            not duplicate_filenames
-        ), f"The following {len(duplicate_filenames)} filename(s) are duplicated: {', '.join(duplicate_filenames)}"
+        assert not duplicate_filenames, (
+            f"The following {len(duplicate_filenames)} filename(s) are"
+            f"duplicated: {', '.join(duplicate_filenames)}"
+        )
         return v
 
     @field_validator("images")
@@ -231,9 +234,10 @@ class Captions(BaseModel):
 
         Args:
             images_path (str): The path of the images.
-            splits (set[str]): Image pair from intent is taken only if its 'split' field\
-            is one of the strings in 'splits'. Allowed values are 'train', 'val', 'test'.\
-            Defaults to {"train", "val"}.
+            splits (set[str]): Image pair from intent is taken only if its\
+                'split' field is one of the strings in 'splits'. Allowed\
+                values are 'train', 'val', 'test'. Defaults to\
+                {"train", "val"}.
 
         Returns:
             List[ImagePairsWithIntent]: A list of pairs of images with intents.
@@ -267,7 +271,8 @@ class Captions(BaseModel):
                 of a word to be included in the vocabulary. Defaults to 5.
 
         Returns:
-            tuple[set[str], set[str]]: A tuple containing the vocabulary and the eliminated words.
+            tuple[set[str], set[str]]: A tuple containing the vocabulary and\
+                the eliminated words.
         """
         vocabulary = set()
         eliminated_words = set()
@@ -408,9 +413,10 @@ class Image(BaseModel):
             split (Literal["test", "train", "val"]): The split of the images.
             imageA (Image): The first image.
             imageB (Image): The second image.
-            overwrite (bool): Whether to overwrite the existing images. Defaults to False.
-            make_dirs (bool): Whether to create the directories if they do not exist.\
-                Defaults to True.
+            overwrite (bool): Whether to overwrite the existing images.\
+                Defaults to False.
+            make_dirs (bool): Whether to create the directories if they do not\
+                exist. Defaults to True.
         """
         imageA_path, imageB_path = Image.get_paths_for_pair_of_images(
             base_path, split, imageA.filename, levircc=(dataset == "LevirCC")
@@ -607,14 +613,16 @@ class ImagePairWithIntent(BaseModel):
             **self.intent.model_dump(
                 exclude_unset=True, exclude_defaults=True
             ),  # copy all *SET* fields from the original intent
-            "sentences": augmented_sentences,  # replace the sentences field with the new sentences
+            # replace the sentences fieldwith the new sentences
+            "sentences": augmented_sentences,
         }
 
         # get the set fields of the model
         set_fields = self.intent.model_fields_set
         set_fields.add(
             "sentences"
-        )  # add the sentences field to the set fields (just in case it's not there)
+        )  # add the sentences field to the set fields
+        # (just in case it's not there)
 
         # create a new intent with the new values
         new_intent = Intent.model_construct(
@@ -643,12 +651,14 @@ class ImagePairs(BaseModel):
         splits: set[str] = {"train", "val"},
     ) -> "ImagePairs":
         """
-        Loads a list of pairs of images with intents from the given JSON file and images.
+        Loads a list of pairs of images with intents from the given JSON file
+        and images.
 
         Args:
             json_path (str): The path of the JSON file.
             images_path (str): The path of the images.
-            splits (set[str]): Image pair from intent is taken only if its 'split' field
+            splits (set[str]): Image pair from intent is taken only if its\
+                'split' field
 
         Returns:
             List[ImagePairsWithIntent]: A list of pairs of images with intents.
@@ -669,7 +679,8 @@ class ImagePairs(BaseModel):
         Args:
             augment_function (Callable): The augmentation function.
             augmenter_name (Optional[str]): The name of the augmentation.
-            If not provided, the name of the augmentation function is used. Defaults to None.
+            If not provided, the name of the augmentation function is used.\
+                Defaults to None.
             **kwargs: The keyword arguments for the augmentation function.
 
         Returns:
@@ -699,13 +710,16 @@ class ImagePairs(BaseModel):
         **kwargs,
     ) -> "AugmentedImagePairs":
         """
-        Augments the image pairs with the given augmentation function with a random probability.
+        Augments the image pairs with the given augmentation function with a
+        random probability.
 
         Args:
             augment_function (Callable): The augmentation function.
-            probability (float): The probability of applying the augmentation function. Defaults to 0.5.
-            augmenter_name (Optional[str]): The name of the augmentation.
-            If not provided, the name of the augmentation function is used. Defaults to None.
+            probability (float): The probability of applying the augmentation\
+                function. Defaults to 0.5.
+            augmenter_name (Optional[str]): The name of the augmentation.\
+                If not provided, the name of the augmentation function is\
+                used. Defaults to None.
             **kwargs: The keyword arguments for the augmentation function.
 
         Returns:
@@ -805,7 +819,8 @@ class AugmentedImagePairs(ImagePairs):
                 make_dirs=make_dirs,
             )
         print(
-            f"{len(self.pairs)} {self.augmenter_name!r} augmented image pairs saved to {output_path}"
+            f"{len(self.pairs)} {self.augmenter_name!r} augmented image pairs "
+            f"saved to {output_path}"
         )
 
     def __get_augmented_filename(
@@ -820,7 +835,10 @@ class AugmentedImagePairs(ImagePairs):
         )
 
         # create a new filename with the augmenter name
-        new_filename = f"{old_filename_root}_{self.augmenter_name}{old_filename_extension}"
+        new_filename = (
+            f"{old_filename_root}_{self.augmenter_name}"
+            + old_filename_extension
+        )
 
         if overwrite:
             return new_filename
@@ -834,7 +852,10 @@ class AugmentedImagePairs(ImagePairs):
             )
         ):
             # if it does, add a counter to the filename
-            new_filename = f"{old_filename_root}_{self.augmenter_name}_{counter}{old_filename_extension}"
+            new_filename = (
+                f"{old_filename_root}_{self.augmenter_name}_"
+                f"{counter}{old_filename_extension}"
+            )
             counter += 1
 
         return new_filename
