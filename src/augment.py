@@ -1,5 +1,5 @@
 """
-This script is used to augment the images and captions in the JSON file.
+Augment the images and captions using the selected augmenters.
 The augmented images and captions are saved in the output folder.
 The original images and captions are also copied to the output folder.
 The augmented JSON files are merged into a single JSON file.
@@ -42,7 +42,7 @@ def get_inputs(
 
 def get_args(argv: Optional[Sequence[str]] = None) -> Namespace:
     parser = argparse.ArgumentParser(
-        description="Augment images and captions in the JSON file",
+        description=__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
