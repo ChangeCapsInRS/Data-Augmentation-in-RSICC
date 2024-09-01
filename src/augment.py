@@ -49,56 +49,52 @@ def get_args(argv: Optional[Sequence[str]] = None) -> Namespace:
         "--images-directory",
         "-i",
         type=str,
-        default=r"data/SampleImagesWithoutAugmentation",
         help="Path to the directory containing the images",
     )
     parser.add_argument(
         "--json-path",
         "-j",
         type=str,
-        default=r"data/merged_no_aug_without_unicode_sampled.json",
         help="Path to the JSON file containing the captions",
     )
-    parser.add_argument(
-        "--output-folder",
-        "-o",
-        type=str,
-        required=True,
-        help="Path to the output folder",
-    )
-    parser.add_argument(
-        "--augmenter-names",
-        "-a",
-        required=True,
-        nargs="+",
-        help="List of augmenters to run",
-        choices=METHOD_NAME_TO_FUNCTION.keys(),
-    )
-    parser.add_argument(
-        "--split",
-        "-s",
-        nargs="+",
-        choices=["train", "val", "test"],
-        default=["train", "val"],
-        help="List of splits to augment",
-    )
-    parser.add_argument(
+
+    output_args = parser.add_argument_group("Output arguments")
+    output_args.add_argument(
         "--overwrite",
         "-w",
         action="store_true",
         help="Overwrite the output files if they already exist",
     )
-    parser.add_argument(
+    output_args.add_argument(
         "--make-directories",
         "-m",
         help="Create the output directories if they do not exist",
         default=True,
         type=bool,
     )
-    parser.add_argument(
-        "--levircc",
-        action="store_true",
-        help="Use LEVIR-CC dataset",
+    output_args.add_argument(
+        "--output-folder",
+        "-o",
+        type=str,
+        required=True,
+        help="Path to the output folder",
+    )
+
+    augmentations_args = parser.add_argument_group("Augmentation arguments")
+    augmentations_args.add_argument(
+        "--augmenter-names",
+        required=True,
+        nargs="+",
+        help="List of augmenters to run",
+        choices=METHOD_NAME_TO_FUNCTION.keys(),
+    )
+    augmentations_args.add_argument(
+        "--split",
+        "-s",
+        nargs="+",
+        choices=["train", "val", "test"],
+        default=["train", "val"],
+        help="List of splits to augment",
     )
     args = parser.parse_args(argv)
 
