@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 
-from schemas import Captions
+from src.schemas import Captions
 
 
 def set_up_parser():

@@ -13,11 +13,9 @@ import sys
 from argparse import Namespace
 from typing import Optional, Sequence
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from augmentation_methods import METHOD_NAME_TO_FUNCTION  # noqa: E402
-from merge import Merger  # noqa: E402
-from schemas import Captions  # noqa: E402
+from src.augmentation_methods import METHOD_NAME_TO_FUNCTION
+from src.merge import Merger
+from src.schemas import Captions
 
 RANDOM_SEED = 42
 
