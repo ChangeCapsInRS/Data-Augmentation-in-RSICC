@@ -1,10 +1,9 @@
 import copy
-from typing import Callable, List, Literal, Optional, Sequence, Tuple
+from typing import Callable, List, Literal, Sequence, Tuple
 
 import cv2 as cv
 import numpy as np
 
-from src.paraphrase import paraphrase_intent
 from src.random_augment import RandomAugmenter
 
 BOTTOM_DIRECTIONS = (
@@ -478,59 +477,6 @@ def brighten_after(
     return augmented_images[0], augmented_images[1], augment_text()
 
 
-def warp_perspective(
-    before_image: np.ndarray,
-    after_image: np.ndarray,
-    raw_sentences: Sequence[str],
-    **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
-    def augment_images():
-        row_count, column_count, channel_count = before_image.shape
-
-        # Source quadrangle's points lie on four corners of the source image
-        source_quadrangle = np.float32(
-            [
-                [0, 0],
-                [column_count, 0],
-                [0, row_count],
-                [column_count, row_count],
-            ]
-        )
-
-        top_left_x_offset, top_left_y_offset = 10, 25
-        top_right_x_offset, top_right_y_offset = 80, 55
-        bottom_left_x_offset, bottom_left_y_offset = 45, 15
-        bottom_right_x_offset, bottom_right_y_offset = 10, 25
-        destination_quadrangle = np.float32(
-            [
-                [top_left_x_offset, top_left_y_offset],
-                [column_count - top_right_x_offset, top_right_y_offset],
-                [bottom_left_x_offset, row_count - bottom_left_y_offset],
-                [
-                    column_count - bottom_right_x_offset,
-                    row_count - bottom_right_y_offset,
-                ],
-            ]
-        )
-        transform_matrix = cv.getPerspectiveTransform(
-            source_quadrangle, destination_quadrangle
-        )
-        warped_before_image = cv.warpPerspective(
-            before_image, transform_matrix, (row_count, column_count)
-        )
-        warped_after_image = cv.warpPerspective(
-            after_image, transform_matrix, (row_count, column_count)
-        )
-        return warped_before_image, warped_after_image
-
-    def augment_text():
-        return list(copy.deepcopy(raw_sentences))
-
-    new_images, new_captions = augment_images(), augment_text()
-    new_before_image, new_after_image = new_images[0], new_images[1]
-    return new_before_image, new_after_image, new_captions
-
-
 def random_augment(
     before_image: np.ndarray,
     after_image: np.ndarray,
@@ -571,57 +517,6 @@ def random_augment(
     return random_augmenter.augment(before_image, after_image, raw_sentences)
 
 
-def paraphrase(
-    before_image: np.ndarray,
-    after_image: np.ndarray,
-    raw_sentences: Sequence[str],
-    *,
-    vocab: Optional[set[str]] = None,
-    **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
-    """Paraphrase the sentences in the list using the paraphrase_intent
-    function from the paraphrase module.
-
-    Args
-    ----
-        before_image (np.ndarray): The image before the augmentation.
-        after_image (np.ndarray): The image after the augmentation.
-        raw_sentences (Sequence[str]): The list of sentences to paraphrase.
-        vocab (Optional[set[str]], optional): The vocabulary set.\
-        If None, the vocabulary is extracted from the sentences. Defaults to None.
-
-    Returns
-    -------
-        tuple[np.ndarray, np.ndarray, List[str]]: The augmented images and
-        the paraphrased sentences.
-    """
-    if vocab is None:
-        # extract the vocabulary from the sentences
-        vocab = set(
-            word for sentence in raw_sentences for word in sentence.split()
-        )
-
-    # paraphrase the sentences
-    paraphrased_sentences = paraphrase_intent(
-        raw_sentences,
-        vocab=vocab,
-        wait_seconds=0.1,
-        before_image=before_image,
-        after_image=after_image,
-    )
-
-    # check if the paraphrased sentences list is empty
-    if not paraphrased_sentences:
-        # if the list is empty, return the original pair
-        return before_image, after_image, list(copy.deepcopy(raw_sentences))
-
-    return (
-        copy.deepcopy(before_image),
-        copy.deepcopy(after_image),
-        paraphrased_sentences,
-    )
-
-
 # Only change this when new augmentation method is implemented,
 # do not delete or comment out working methods
 AUGMENTATION_METHODS: List[
@@ -641,8 +536,6 @@ AUGMENTATION_METHODS: List[
     brighten_before,
     brighten_after,
     random_augment,
-    paraphrase,
-    warp_perspective,
 ]
 
 METHOD_NAME_TO_FUNCTION = {

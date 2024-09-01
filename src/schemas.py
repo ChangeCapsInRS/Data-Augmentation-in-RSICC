@@ -1,34 +1,24 @@
 import os
 import random
 from collections import Counter
-from concurrent.futures import ThreadPoolExecutor
 from typing import Annotated, Any, Callable, Dict, List, Literal, Optional
 
 import cv2
-import language_tool_python
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
     NonNegativeInt,
     StringConstraints,
-    ValidationError,
     computed_field,
     field_validator,
     model_serializer,
     model_validator,
 )
-from termcolor import cprint
 from tqdm import tqdm
-from typing_extensions import Self, deprecated
+from typing_extensions import Self
 
-from src.utils import (
-    check_sentence_grammar,
-    check_sentence_spelling,
-    correct_sentence_grammar,
-    correct_sentence_spelling,
-    normalize_sentence,
-)
+from src.utils import normalize_sentence
 
 
 class Sentence(BaseModel):
@@ -54,22 +44,6 @@ class Sentence(BaseModel):
     imgid: NonNegativeInt
     sentid: NonNegativeInt
 
-    # @field_validator("raw")
-    # @classmethod
-    # def remove_extra_spaces_from_raw(cls, v: str) -> str:
-    #     """
-    #     Removes extra spaces from the raw string.
-    #     """
-    #     return " ".join(v.split())
-
-    # @field_validator("raw")
-    # @classmethod
-    # def remove_non_alphanumeric_characters_from_raw(cls, v: str) -> str:
-    #     """
-    #     Removes non-alphanumeric characters from the raw string.
-    #     """
-    #     return " ".join([word for word in v.split() if word.isalnum()])
-
     @field_validator("raw")
     @classmethod
     def normalize_raw(cls, v: str) -> str:
@@ -89,33 +63,6 @@ class Sentence(BaseModel):
         v["tokens"] = [word for word in raw_sentence.split() if word.isalnum()]
         return v
 
-    # @model_validator(mode="after")
-    # def tokens_and_raw_must_have_same_length(self) -> Self:
-    #     """
-    #     Validates that the number of tokens and the length of the raw string are the same.
-    #     """
-    #     assert len(self.raw.split()) == len(
-    #         self.tokens
-    #     ), "The raw and tokens list have different lengths"
-    #     return self
-
-    @deprecated(
-        (
-            "This method cannot be used because the language_tool_python library is not working properly."
-            "The server used for grammar checking times out after a certain number of requests (~3200 intents)."
-        )
-    )
-    def check_grammar(self) -> List[language_tool_python.Match]:
-        """
-        Checks the grammar errors in the sentence.
-
-        Returns:
-            List[language_tool_python.Match]: A list of grammar errors in the sentence.
-        """
-        # Check text for grammar errors
-        matches = check_sentence_grammar(self.raw)
-        return matches
-
     def update_with_validation(self, **kwargs):
         """
         ## WARNING: This method may not behave correctly with the checks in the model. Only the given fields are updated.
@@ -133,56 +80,6 @@ class Sentence(BaseModel):
 
         for key in kwargs:
             setattr(self, key, getattr(validated_self, key))
-
-    @deprecated(
-        (
-            "This method cannot be used because the language_tool_python library is not working properly."
-            "The server used for grammar checking times out after a certain number of requests (~3200 intents)."
-        )
-    )
-    def correct_grammar(self, grammar_errors) -> None:
-        """
-        Corrects the grammar errors in the sentence.
-        """
-        # Correct grammar errors
-        corrected_raw_sentence = correct_sentence_grammar(
-            self.raw, grammar_errors
-        )
-        try:
-            corrected_token = corrected_raw_sentence.split()
-            self.update_with_validation(
-                raw=corrected_raw_sentence, tokens=corrected_token
-            )
-        except ValidationError as e:
-            print(
-                f"Encountered an error while correcting the grammar of the sentence: {self.raw=} {corrected_raw_sentence=} {grammar_errors=} {e}"
-            )
-
-    def check_spelling(self):
-        """
-        Checks the spelling of the sentence.
-
-        Returns:
-            set[tuple[str, str]]: The misspelled words and their correct spelling. [(misspelled_word, correct_spelling)]
-        """
-        return check_sentence_spelling(self.raw)
-
-    def correct_spelling(self, spelling_errors):
-        """
-        Corrects the spelling errors in the sentence.
-        """
-        corrected_raw_sentence = correct_sentence_spelling(
-            self.raw, spelling_errors
-        )
-        corrected_token = corrected_raw_sentence.split()
-        try:
-            self.update_with_validation(
-                raw=corrected_raw_sentence, tokens=corrected_token
-            )
-        except ValidationError as e:
-            print(
-                f"Encountered an error while correcting the spelling of the sentence: {self.raw=} {corrected_raw_sentence=} {spelling_errors=} {e}"
-            )
 
 
 class Intent(BaseModel):
@@ -209,31 +106,6 @@ class Intent(BaseModel):
     filename: Annotated[
         str, StringConstraints(min_length=1, strict=True)
     ]  # the filename is a non-empty string
-
-    # ? It may be better to not change the number of sentences
-    # @field_validator("sentences")
-    # @classmethod
-    # def sentences_must_have_five_items(cls, v):
-    #     """
-    #     Validates that the sentences list has 5 items.
-    #     """
-    #     assert len(v) != 0, "The sentences list is empty"
-
-    #     if len(v) == 5:
-    #         return v
-
-    #     if len(v) > 5:
-    #         return v[:5]
-
-    #     # if the number of sentences is less than 5, repeat the sentences
-    #     for i in range(len(v), 5):
-    #         new_sentence = v[0].copy()
-    #         new_sentence.sentid = i
-    #         v.append(new_sentence)
-
-    #     # sanity check
-    #     assert len(v) == 5, "The number of sentences is not 5"
-    #     return v
 
     @field_validator("sentences")
     @classmethod
@@ -288,57 +160,6 @@ class Intent(BaseModel):
         assert (
             self.filepath == self.split
         ), "The filepath must be the same as the split"
-        return self
-
-    def check_for_errors(self) -> List[Dict[str, Any]]:
-        """
-        Checks for spelling and grammar errors in the sentences of the intent.
-
-        Returns:
-            List[Dict[str, Any]]: A list of errors in the sentences of the intent.
-        """
-        errors = []
-        for i, sentence in enumerate(self.sentences):
-            errors_in_sentence = dict()
-            # grammar_errors = sentence.check_grammar()
-            # if grammar_errors:
-            #     errors_in_sentence["grammar_errors"] = grammar_errors
-
-            spelling_errors = sentence.check_spelling()
-            if spelling_errors:
-                errors_in_sentence["spelling_errors"] = spelling_errors
-
-            # if there are errors in the sentence
-            # save sentence index and errors to the list
-            if errors_in_sentence:
-                errors_in_sentence["sentence_index"] = i
-                errors.append(errors_in_sentence)
-        return errors
-
-    def fix_errors(self, errors: Optional[List[Dict]] = None) -> Self:
-        """
-        Fixes the spelling and grammar errors in the sentences of the intent.
-
-        Args:
-            errors (Optional[List[dict]]): The errors in the sentences of the intent.
-
-        Returns:
-            Self: The intent with the fixed errors.
-        """
-        if not errors:
-            errors = self.check_for_errors()
-
-        for error in errors:
-            # get the sentence with the error
-            sentence: Sentence = self.sentences[error["sentence_index"]]
-            # if "grammar_errors" in error:
-            #     sentence.correct_grammar(error["grammar_errors"])
-
-            if "spelling_errors" in error:
-                sentence.correct_spelling(error["spelling_errors"])
-            # ? Can we remove this line?
-            self.sentences[error["sentence_index"]] = sentence
-
         return self
 
     def get_raw_sentences(self) -> List[str]:
@@ -435,107 +256,6 @@ class Captions(BaseModel):
 
         return ImagePairs(pairs=results)
 
-    @staticmethod
-    def check_errors_in_sentences_(
-        intents: List[Intent],
-    ) -> List[Dict[str, Any]]:
-        """
-        Checks for spelling and grammar errors in the sentences of the intents.
-
-        Args:
-            intents (List[Intent]): The list of intents.
-
-        Returns:
-            List[Dict[str, Any]]: A list of errors in the sentences of the intents.
-        """
-        check_errors = lambda x: {"intent": x, "errors": x.check_for_errors()}
-
-        with ThreadPoolExecutor() as executor:
-            error_checks = list(
-                tqdm(
-                    executor.map(check_errors, intents),
-                    total=len(intents),
-                    desc="Checking errors",
-                    unit="intent",
-                )
-            )
-
-        errors = [error for error in error_checks if error["errors"]]
-
-        return errors
-
-    def check_errors_in_sentences(self) -> List[Dict[str, Any]]:
-        """
-        Checks for spelling and grammar errors in the sentences of the intents.
-
-        Returns:
-            List[Dict[str, Any]]: A list of errors in the sentences of the intents.
-        """
-
-        return Captions.check_errors_in_sentences_(self.images)
-
-    def fix_errors_in_sentences(
-        self,
-        errors: Optional[List[Dict[str, Any]]] = None,
-        max_iterations: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
-        """
-        Fixes the spelling and grammar errors in the sentences of the intents.
-
-        Args:
-            errors (Optional[List[Dict[str, Any]]]): The errors \
-                in the sentences of the intents. Defaults to None.
-            max_iterations (Optional[int]): The maximum number of \
-                iterations to fix the errors. Defaults to 5.
-
-        Returns:
-            List[Dict[str, Any]]: The list of remaining errors in the sentences of the intents.
-        """
-        if not errors:
-            errors = self.check_errors_in_sentences()
-        if not max_iterations:
-            max_iterations = 5
-
-        if len(errors) == 0:
-            print("No errors found")
-            return []
-
-        # TODO: For some reason the grammar checker server times out after ~3200 requests, so we need to fix the server or find a workaround
-        # Fix the errors until there are no errors or the maximum number of iterations is reached
-        current_iteration = 1
-        while errors and current_iteration <= max_iterations:
-            with ThreadPoolExecutor() as executor:
-                fixed_intents = list(
-                    tqdm(
-                        executor.map(
-                            lambda x: x["intent"].fix_errors(x["errors"]),
-                            errors,
-                        ),
-                        total=len(errors),
-                        desc=f"Fixing errors (iteration {current_iteration}/{max_iterations})",
-                        unit="intent",
-                    )
-                )
-
-            current_iteration += 1
-
-            # check for errors again
-            errors = Captions.check_errors_in_sentences_(fixed_intents)
-
-        if errors:
-            # print the remaining errors
-            print(
-                f"WARNING: The following {len(errors)} intent(s) still have errors:"
-            )
-            for error in errors:
-                print(error["intent"].filename)
-        else:
-            print("All errors have been fixed")
-
-        # ? This might be overkill, considering the Intent.fix_errors \
-        # method already validates the model
-        return errors
-
     def get_vocabulary(
         self, minimum_occurrences: int = 5
     ) -> tuple[set[str], set[str]]:
@@ -611,13 +331,12 @@ class Captions(BaseModel):
         return Captions.model_validate(captions_dict)
 
     @staticmethod
-    def load(json_path: str, *, fixes_errors: bool = False) -> "Captions":
+    def load(json_path: str) -> "Captions":
         """
         Loads the captions from the given JSON file.
 
         Args:
             json_path (str): The path of the JSON file.
-            fixes_errors (bool): Whether to fix the errors in the sentences. Defaults to False.
 
         Returns:
             Captions: The captions loaded from the JSON file.
@@ -626,11 +345,6 @@ class Captions(BaseModel):
         with open(json_path, "r") as f:
             captions = Captions.model_validate_json(f.read())
 
-        if fixes_errors:
-            errors: List[Dict[str, Any]] = captions.check_errors_in_sentences()
-            if len(errors) > 0:
-                cprint("WARNING: input file has errors", "red")
-                captions.fix_errors_in_sentences(errors)
         return captions
 
 
@@ -926,7 +640,6 @@ class ImagePairs(BaseModel):
     def load(
         json_path: str,
         images_path: str,
-        fixes_errors: bool = False,
         splits: set[str] = {"train", "val"},
     ) -> "ImagePairs":
         """
@@ -935,13 +648,12 @@ class ImagePairs(BaseModel):
         Args:
             json_path (str): The path of the JSON file.
             images_path (str): The path of the images.
-            fixes_errors (bool): Whether to fix the errors in the sentences. Defaults to False.
             splits (set[str]): Image pair from intent is taken only if its 'split' field
 
         Returns:
             List[ImagePairsWithIntent]: A list of pairs of images with intents.
         """
-        captions = Captions.load(json_path, fixes_errors=fixes_errors)
+        captions = Captions.load(json_path)
         return captions.to_ImagePairs(images_path, splits)
 
     def augment(

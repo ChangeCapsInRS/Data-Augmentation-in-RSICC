@@ -22,17 +22,12 @@ if __name__ == "__main__":
         type=str,
         help="Path to the output JSON file",
     )
-    # parser.add_argument(
-    #     "--fix_errors",
-    #     action="store_true",
-    #     help="Fix the errors in the file if any (does not work currently)",
-    #     default=False,
-    # )
 
     # Parse the command-line arguments
     args = parser.parse_args()
 
     # open and read the file
+    # (the captions are automatically preprocessed when the file is loaded)
     captions = Captions.load(args.captions_path)
 
     # dump the validated content to the output file

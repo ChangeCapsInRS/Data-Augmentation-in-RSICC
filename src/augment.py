@@ -15,9 +15,9 @@ from typing import Optional, Sequence
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from augmentation_methods import METHOD_NAME_TO_FUNCTION
-from merge import Merger
-from schemas import Captions
+from augmentation_methods import METHOD_NAME_TO_FUNCTION  # noqa: E402
+from merge import Merger  # noqa: E402
+from schemas import Captions  # noqa: E402
 
 RANDOM_SEED = 42
 
@@ -26,10 +26,9 @@ def get_inputs(
     images_directory_name: str,
     json_path: str,
     splits: set[str],
-    fixes_errors: bool = False,
     levircc: bool = False,
 ):
-    captions = Captions.load(json_path, fixes_errors=fixes_errors)
+    captions = Captions.load(json_path)
 
     vocab, _ = captions.get_vocabulary()
 
