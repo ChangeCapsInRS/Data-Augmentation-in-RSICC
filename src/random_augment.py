@@ -9,18 +9,15 @@ class RandomAugmenter:
     def __init__(
         self,
         augmenter_list: List[List[List[Callable]]],
-        *,
-        version: int = 3,
         **kwargs,
     ) -> None:
         self.AUGMENTERS = augmenter_list
         self.MINIMUM_AUGMENTER_COUNT = 1
         self.N_AUGMENTER = len(self.AUGMENTERS)
         self.vocab = kwargs.get("vocab", None)
-        self.version = version
 
     def __print_shuffled_augmenters(self, shuffled_augmenters):
-        print(f"{__name__} version {self.version} augmenters: ", end="")
+        print(f"{__name__} augmenters: ", end="")
 
         for augmenter in shuffled_augmenters:
             print(augmenter.__name__, end=" ")
@@ -95,37 +92,11 @@ class RandomAugmenter:
         after_image: np.ndarray,
         raw_sentences: Sequence[str],
     ) -> tuple[np.ndarray, np.ndarray, List[str]]:
-        if self.version == 1:
-            shuffled_augmenters = self.__select_from_categories()
-            self.__shuffle(shuffled_augmenters)
-            subset_size = random.randint(1, self.N_AUGMENTER)
-            shuffled_augmenters = shuffled_augmenters[:subset_size]
-            self.__print_shuffled_augmenters(shuffled_augmenters)
-            return self.__apply_augmenters(
-                before_image, after_image, raw_sentences, shuffled_augmenters
-            )
-        elif self.version == 2:
-            shuffled_augmenters = self.__select_from_categories()
-            self.__shuffle(shuffled_augmenters)
-            shuffled_augmenters = self.__extract_subset(shuffled_augmenters)
-
-            self.__print_shuffled_augmenters(shuffled_augmenters)
-
-            return self.__apply_augmenters(
-                before_image, after_image, raw_sentences, shuffled_augmenters
-            )
-        elif self.version == 3:
-            return self.augment_v3(before_image, after_image, raw_sentences)
-        elif self.version == 4:
-            augmenters = [
-                random.choice(random.choice(augmenter))
-                for augmenter in self.AUGMENTERS
-            ]
-
-            self.__print_shuffled_augmenters(augmenters)
-
-            return self.__apply_augmenters(
-                before_image, after_image, raw_sentences, augmenters
-            )
-        else:
-            raise ValueError(f"Invalid version: {self.version}")
+        shuffled_augmenters = self.__select_from_categories()
+        self.__shuffle(shuffled_augmenters)
+        subset_size = random.randint(1, self.N_AUGMENTER)
+        shuffled_augmenters = shuffled_augmenters[:subset_size]
+        self.__print_shuffled_augmenters(shuffled_augmenters)
+        return self.__apply_augmenters(
+            before_image, after_image, raw_sentences, shuffled_augmenters
+        )

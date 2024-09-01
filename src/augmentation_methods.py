@@ -483,36 +483,15 @@ def random_augment(
     raw_sentences: Sequence[str],
     **kwargs,
 ) -> tuple[np.ndarray, np.ndarray, List[str]]:
-    version = 1
-
-    if version == 1:
-        augmenters = [
-            [[horizontal_mirror]],
-            [[vertical_mirror]],
-            [[rotate_90]],
-            [[brighten_both]],
-        ]
-    elif version == 2:
-        augmenters = [
-            [
-                [horizontal_mirror, vertical_mirror, left_diagonal_mirror],
-                [rotate_90, rotate_180, rotate_270],
-            ],
-            [[brighten_both, brighten_before, brighten_after], [blur]],
-        ]
-    elif version == 3:
-        augmenters = [
-            [[rotate_90, rotate_180, rotate_270]],
-            [[blur]],
-        ]
-    elif version == 4:
-        augmenters = [
-            [[rotate_90, rotate_180, rotate_270]],
-            [[blur]],
-        ]
+    augmenters = [
+        [[horizontal_mirror]],
+        [[vertical_mirror]],
+        [[rotate_90]],
+        [[brighten_both]],
+    ]
 
     random_augmenter = RandomAugmenter(
-        augmenters, vocab=kwargs.get("vocab", set()), version=version
+        augmenters, vocab=kwargs.get("vocab", set())
     )
     return random_augmenter.augment(before_image, after_image, raw_sentences)
 
