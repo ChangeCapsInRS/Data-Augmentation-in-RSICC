@@ -8,19 +8,19 @@ from src.random_augment import RandomAugmenter
 
 BOTTOM_DIRECTIONS = (
     "bottom",
-    "lower",
-    "below",
-    "bottommost",
-    "lowest",
+    # "lower",
+    # "below",
+    # "bottommost",
+    # "lowest",
 )
 
 TOP_DIRECTIONS = (
     "top",
-    "upper",
-    "above",
-    "topmost",
-    "highest",
-    "higher",
+    # "upper",
+    # "above",
+    # "topmost",
+    # "highest",
+    # "higher",
 )
 
 
