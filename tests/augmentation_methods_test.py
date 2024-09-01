@@ -196,11 +196,12 @@ def get_left_diagonal_mirrored_images():
     )
 
 
+def convert_opencv_to_pillow_image(image: np.ndarray) -> Image.Image:
+    return Image.fromarray(cv.cvtColor(image, cv.COLOR_BGR2RGB))
+
+
 def assert_images_equal(image_1: np.ndarray, image_2: np.ndarray) -> None:
     assert isinstance(image_1, np.ndarray) and isinstance(image_2, np.ndarray)
-    convert_opencv_to_pillow_image = lambda image: Image.fromarray(
-        cv.cvtColor(image, cv.COLOR_BGR2RGB)
-    )
 
     img1 = convert_opencv_to_pillow_image(image_1)
     img2 = convert_opencv_to_pillow_image(image_2)
