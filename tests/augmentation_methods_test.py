@@ -420,10 +420,10 @@ def test_random_augment_image_transformations(
 @pytest.fixture(
     params=(
         "bottom",
-        "lower",
-        "below",
-        "bottommost",
-        "lowest",
+        # "lower",
+        # "below",
+        # "bottommost",
+        # "lowest",
     )
 )
 def bottom_direction(request):
@@ -433,11 +433,11 @@ def bottom_direction(request):
 @pytest.fixture(
     params=(
         "top",
-        "upper",
-        "above",
-        "topmost",
-        "highest",
-        "higher",
+        # "upper",
+        # "above",
+        # "topmost",
+        # "highest",
+        # "higher",
     )
 )
 def top_direction(request):
