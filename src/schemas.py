@@ -1,5 +1,4 @@
 import os
-import random
 from collections import Counter
 from typing import Annotated, Any, Callable, Dict, List, Literal, Optional
 
@@ -635,48 +634,6 @@ class ImagePairs(BaseModel):
         return AugmentedImagePairs(
             pairs=new_pairs,
             augmenter_name=augmenter_name,
-        )
-
-    def random_augment(
-        self,
-        augment_function: Callable,
-        *,
-        probability: float = 0.5,
-        augmenter_name: Optional[str] = None,
-        **kwargs,
-    ) -> "AugmentedImagePairs":
-        """
-        Augments the image pairs with the given augmentation function with a
-        random probability.
-
-        Args:
-            augment_function (Callable): The augmentation function.
-            probability (float): The probability of applying the augmentation\
-                function. Defaults to 0.5.
-            augmenter_name (Optional[str]): The name of the augmentation.\
-                If not provided, the name of the augmentation function is\
-                used. Defaults to None.
-            **kwargs: The keyword arguments for the augmentation function.
-
-        Returns:
-            AugmentedImagePairs: The augmented image pairs.
-        """
-        augmenter_name = augmenter_name or augment_function.__name__
-        new_pairs = [
-            (
-                pair.augment(augment_function, **kwargs)
-                if random.random() < probability
-                else pair
-            )
-            for pair in tqdm(
-                self.pairs,
-                desc=augmenter_name,
-                unit="intent",
-                total=len(self.pairs),
-            )
-        ]
-        return AugmentedImagePairs(
-            pairs=new_pairs, augmenter_name=augmenter_name
         )
 
 
