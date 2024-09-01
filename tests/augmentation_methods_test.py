@@ -7,14 +7,13 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from src.augmentation_methods import (  # random_augment,; warp_perspective,
+from src.augmentation_methods import (
     blur,
     brighten_after,
     brighten_before,
     brighten_both,
     horizontal_mirror,
     left_diagonal_mirror,
-    paraphrase,
     rotate_90,
     rotate_180,
     rotate_270,
@@ -400,29 +399,6 @@ def test_left_diagonal_mirror_image_transformations(
 
 @pytest.mark.skip("Not implemented yet")
 def test_random_augment_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
-) -> None:
-    raise NotImplementedError("Test not implemented yet")
-
-
-@pytest.mark.slow
-@pytest.mark.parametrize(
-    "base_image",
-    get_base_images(),
-)
-def test_paraphrase_image_transformations(
-    base_image: cv.typing.MatLike,
-) -> None:
-    before_image, after_image, _ = paraphrase(
-        base_image, base_image, ["some sentence"]
-    )
-
-    assert_images_equal(before_image, after_image)
-    assert_images_equal(base_image, after_image)
-
-
-@pytest.mark.skip("Not implemented yet")
-def test_warp_perspective_image_transformations(
     base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
 ) -> None:
     raise NotImplementedError("Test not implemented yet")
