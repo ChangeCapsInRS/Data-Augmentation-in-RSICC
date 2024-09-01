@@ -64,24 +64,6 @@ class Sentence(BaseModel):
         v["tokens"] = [word for word in raw_sentence.split() if word.isalnum()]
         return v
 
-    def update_with_validation(self, **kwargs):
-        """
-        ## WARNING: This method may not behave correctly with the checks in the model. Only the given fields are updated.
-        Updates the sentence with the given values and validates the model.
-
-        Args:
-            **kwargs: The values to update.
-
-        Returns:
-            Sentence: The updated sentence.
-        """
-
-        updated_self = self.model_copy(update=kwargs)
-        validated_self = Sentence.model_validate(updated_self)
-
-        for key in kwargs:
-            setattr(self, key, getattr(validated_self, key))
-
 
 class Intent(BaseModel):
     """
@@ -212,17 +194,6 @@ class Captions(BaseModel):
         ), "The imgid of the intents must be unique"
         return v
 
-    def add_intent(self, intent: Intent) -> None:
-        """
-        Adds an intent to the list of intents.
-
-        Args:
-            intent (Intent): The intent to add.
-        """
-        self.images.append(intent)
-
-        self = Captions.model_validate(self)
-
     def to_ImagePairs(
         self,
         images_path: str,
@@ -313,9 +284,6 @@ class Captions(BaseModel):
         for intent in captions_dict["images"]:
             # set the imgid of the intent
             intent["imgid"] = imgid
-
-            # sort the sentences by raw
-            # intent["sentences"] = sorted(intent["sentences"], key=lambda x: x["raw"])
 
             # set the sentid and imgid of the sentences
             for sentence in intent["sentences"]:
@@ -537,38 +505,6 @@ class ImagePairWithIntent(BaseModel):
             Any: The concatenated image.
         """
         return cv2.hconcat([self.imgA.data, self.imgB.data])
-
-    def st_write(self) -> None:
-        """
-        Writes the image pair and the intent to the Streamlit app.
-        """
-        import streamlit as st
-
-        before_image_column, after_image_column, intent_column = st.columns(
-            [1, 1, 2]
-        )
-
-        with before_image_column:
-            st.image(
-                self.imgA.data, use_column_width=True, caption="Before Image"
-            )
-
-        with after_image_column:
-            st.image(
-                self.imgA.data, use_column_width=True, caption="After Image"
-            )
-
-        with intent_column:
-            st.write("**Captions**")
-            with st.container(border=True):
-                st.text(
-                    "\n".join(
-                        [sentence.raw for sentence in self.intent.sentences]
-                    )
-                )
-
-        # st.divider()
-        # st.write(f"File Name: `{self.fileName}` Category: `{self.intent.category}`")
 
     def augment(
         self, augment_function: Callable, **kwargs
