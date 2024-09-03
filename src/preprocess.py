@@ -1,6 +1,7 @@
 """
 This script is used to preprocess the captions in the JSON file.
 """
+from __future__ import annotations
 
 import argparse
 

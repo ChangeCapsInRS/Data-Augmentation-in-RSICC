@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 import os
 from collections import Counter
-from typing import Annotated, Any, Callable, Dict, List, Literal, Optional
+from collections.abc import Callable
+from typing import Annotated
+from typing import Any
+from typing import Literal
 
 import cv2
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    NonNegativeInt,
-    StringConstraints,
-    computed_field,
-    field_validator,
-    model_serializer,
-    model_validator,
-)
+from pydantic import BaseModel
+from pydantic import computed_field
+from pydantic import ConfigDict
+from pydantic import Field
+from pydantic import field_validator
+from pydantic import model_serializer
+from pydantic import model_validator
+from pydantic import NonNegativeInt
+from pydantic import StringConstraints
 from tqdm import tqdm
 from typing_extensions import Self
 
@@ -26,15 +29,18 @@ class Sentence(BaseModel):
     """
 
     model_config = ConfigDict(
-        revalidate_instances="always", validate_assignment=True
+        revalidate_instances="always",
+        validate_assignment=True,
     )
 
-    tokens: List[
+    tokens: list[
         Annotated[
-            str, StringConstraints(min_length=1, to_lower=True)
+            str,
+            StringConstraints(min_length=1, to_lower=True),
         ]  # the tokens are non-empty strings with only words
     ] = Field(
-        min_length=2, max_length=50
+        min_length=2,
+        max_length=50,
     )  # the number of tokens is at least 2 and at most 20
     raw: Annotated[
         str,
@@ -53,7 +59,7 @@ class Sentence(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def set_tokens_as_split_raw(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+    def set_tokens_as_split_raw(cls, v: dict[str, Any]) -> dict[str, Any]:
         """
         Sets the tokens as the split raw string.
         """
@@ -70,23 +76,26 @@ class Intent(BaseModel):
     """
 
     model_config = ConfigDict(
-        revalidate_instances="always", validate_assignment=True
+        revalidate_instances="always",
+        validate_assignment=True,
     )
 
-    sentences: List[Sentence] = Field(
-        min_length=1
+    sentences: list[Sentence] = Field(
+        min_length=1,
     )  # the number of sentences is at least 1
     changeflag: Annotated[
-        int, Field(ge=0, le=1, strict=True)
+        int,
+        Field(ge=0, le=1, strict=True),
     ]  # the changeflag is 0 or 1
     filepath: Literal["train", "val", "test"]
     split: Literal["train", "val", "test"]
     imgid: NonNegativeInt = Field(strict=True)
-    sentids: List[NonNegativeInt] = Field(
-        min_length=1
+    sentids: list[NonNegativeInt] = Field(
+        min_length=1,
     )  # the number of sentids is at least 1
     filename: Annotated[
-        str, StringConstraints(min_length=1, strict=True)
+        str,
+        StringConstraints(min_length=1, strict=True),
     ]  # the filename is a non-empty string
 
     @field_validator("sentences")
@@ -97,7 +106,7 @@ class Intent(BaseModel):
         """
         sentids = [sentence.sentid for sentence in v]
         assert sentids == list(
-            range(min(sentids), max(sentids) + 1)
+            range(min(sentids), max(sentids) + 1),
         ), "The sentids of the sentences must be consecutive"
         return v
 
@@ -107,7 +116,7 @@ class Intent(BaseModel):
         """
         Validates that the imgid of the sentences is the same.
         """
-        imgids = list(set(sentence.imgid for sentence in v))
+        imgids = list({sentence.imgid for sentence in v})
         assert len(imgids) == 1, "The imgid of the sentences must be the same"
         return v
 
@@ -145,7 +154,7 @@ class Intent(BaseModel):
         ), "The filepath must be the same as the split"
         return self
 
-    def get_raw_sentences(self) -> List[str]:
+    def get_raw_sentences(self) -> list[str]:
         """
         Returns the raw sentences of the intent.
         """
@@ -158,11 +167,12 @@ class Captions(BaseModel):
     """
 
     model_config = ConfigDict(
-        revalidate_instances="always", validate_assignment=True
+        revalidate_instances="always",
+        validate_assignment=True,
     )
 
-    images: List[Intent] = Field(
-        min_length=1
+    images: list[Intent] = Field(
+        min_length=1,
     )  # the number of intents is at least 1
 
     @field_validator("images")
@@ -189,7 +199,7 @@ class Captions(BaseModel):
         """
         imgids = [intent.imgid for intent in v]
         assert len(imgids) == len(
-            set(imgids)
+            set(imgids),
         ), "The imgid of the intents must be unique"
         return v
 
@@ -197,7 +207,7 @@ class Captions(BaseModel):
         self,
         images_path: str,
         splits: set[str] = {"train", "val"},
-    ) -> "ImagePairs":
+    ) -> ImagePairs:
         """
         Converts the captions to a list of pairs of images with intents.
 
@@ -220,16 +230,19 @@ class Captions(BaseModel):
         for intent in self.images:
             if intent.split in splits:
                 imgA, imgB = Image.load_pair_of_images(
-                    images_path, intent.filename, intent.split
+                    images_path,
+                    intent.filename,
+                    intent.split,
                 )
                 results.append(
-                    ImagePairWithIntent(imgA=imgA, imgB=imgB, intent=intent)
+                    ImagePairWithIntent(imgA=imgA, imgB=imgB, intent=intent),
                 )
 
         return ImagePairs(pairs=results)
 
     def get_vocabulary(
-        self, minimum_occurrences: int = 5
+        self,
+        minimum_occurrences: int = 5,
     ) -> tuple[set[str], set[str]]:
         """
         Gets the vocabulary from the captions.
@@ -258,7 +271,7 @@ class Captions(BaseModel):
         return vocabulary, eliminated_words
 
     @staticmethod
-    def normalize_dict(captions_dict: Dict[str, Any]) -> "Captions":
+    def normalize_dict(captions_dict: dict[str, Any]) -> Captions:
         """
         Normalizes the captions.
 
@@ -271,7 +284,8 @@ class Captions(BaseModel):
 
         # sort the captions by filename
         captions_dict["images"] = sorted(
-            captions_dict["images"], key=lambda x: x["filename"]
+            captions_dict["images"],
+            key=lambda x: x["filename"],
         )
 
         # set the imgid and sentid to 0
@@ -301,7 +315,7 @@ class Captions(BaseModel):
         return Captions.model_validate(captions_dict)
 
     @staticmethod
-    def load(json_path: str) -> "Captions":
+    def load(json_path: str) -> Captions:
         """
         Loads the captions from the given JSON file.
 
@@ -312,7 +326,7 @@ class Captions(BaseModel):
             Captions: The captions loaded from the JSON file.
         """
 
-        with open(json_path, "r") as f:
+        with open(json_path) as f:
             captions = Captions.model_validate_json(f.read())
 
         return captions
@@ -327,7 +341,8 @@ class Image(BaseModel):
 
     data: cv2.typing.MatLike
     filename: Annotated[
-        str, StringConstraints(min_length=1)
+        str,
+        StringConstraints(min_length=1),
     ]  # the fileName is a non-empty string
 
     @staticmethod
@@ -335,7 +350,7 @@ class Image(BaseModel):
         base_path: str,
         filename: str,
         split: Literal["test", "train", "val"],
-    ) -> tuple["Image", "Image"]:
+    ) -> tuple[Image, Image]:
         """
         Reads a pair of images from the given base path.
 
@@ -348,21 +363,24 @@ class Image(BaseModel):
             tuple[Image, Image]: A tuple containing the pair of images.
         """
         imageA_path, imageB_path = Image.get_paths_for_pair_of_images(
-            base_path, split, filename
+            base_path,
+            split,
+            filename,
         )
         imgA = cv2.imread(imageA_path)
         imgB = cv2.imread(imageB_path)
 
         return Image(data=imgA, filename=filename), Image(
-            data=imgB, filename=filename
+            data=imgB,
+            filename=filename,
         )
 
     @staticmethod
     def write_pair_of_images(
         base_path: str,
         split: Literal["test", "train", "val"],
-        imageA: "Image",
-        imageB: "Image",
+        imageA: Image,
+        imageB: Image,
         *,
         overwrite: bool = False,
         make_dirs: bool = True,
@@ -381,7 +399,9 @@ class Image(BaseModel):
                 exist. Defaults to True.
         """
         imageA_path, imageB_path = Image.get_paths_for_pair_of_images(
-            base_path, split, imageA.filename
+            base_path,
+            split,
+            imageA.filename,
         )
 
         if make_dirs:
@@ -390,10 +410,10 @@ class Image(BaseModel):
 
         if not overwrite:
             assert not os.path.exists(
-                imageA_path
+                imageA_path,
             ), f"File {imageA_path} already exists"
             assert not os.path.exists(
-                imageB_path
+                imageB_path,
             ), f"File {imageB_path} already exists"
 
         cv2.imwrite(imageA_path, imageA.data)
@@ -469,7 +489,7 @@ class ImagePairWithIntent(BaseModel):
 
     # This method is called when the object is serialized into a dictionary
     @model_serializer()
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """
         Serializes the image pair and the intent to a dictionary.
         """
@@ -480,7 +500,7 @@ class ImagePairWithIntent(BaseModel):
                 "sentences": [
                     sentence.model_dump() for sentence in self.intent.sentences
                 ],
-            }
+            },
         }
 
     def get_concatenated_image(self) -> Any:
@@ -493,8 +513,10 @@ class ImagePairWithIntent(BaseModel):
         return cv2.hconcat([self.imgA.data, self.imgB.data])
 
     def augment(
-        self, augment_function: Callable, **kwargs
-    ) -> "ImagePairWithIntent":
+        self,
+        augment_function: Callable,
+        **kwargs,
+    ) -> ImagePairWithIntent:
         """
         Augments the image pair with the given augmentation function.
 
@@ -533,7 +555,8 @@ class ImagePairWithIntent(BaseModel):
         # the new values for the augmented image pair
         new_values = {
             **self.intent.model_dump(
-                exclude_unset=True, exclude_defaults=True
+                exclude_unset=True,
+                exclude_defaults=True,
             ),  # copy all *SET* fields from the original intent
             # replace the sentences fieldwith the new sentences
             "sentences": augmented_sentences,
@@ -542,7 +565,7 @@ class ImagePairWithIntent(BaseModel):
         # get the set fields of the model
         set_fields = self.intent.model_fields_set
         set_fields.add(
-            "sentences"
+            "sentences",
         )  # add the sentences field to the set fields
         # (just in case it's not there)
 
@@ -554,24 +577,26 @@ class ImagePairWithIntent(BaseModel):
 
         return ImagePairWithIntent(
             imgA=Image(
-                data=augmented_before_image, filename=self.imgA.filename
+                data=augmented_before_image,
+                filename=self.imgA.filename,
             ),
             imgB=Image(
-                data=augmented_after_image, filename=self.imgB.filename
+                data=augmented_after_image,
+                filename=self.imgB.filename,
             ),
             intent=new_intent,
         )
 
 
 class ImagePairs(BaseModel):
-    pairs: List["ImagePairWithIntent"]
+    pairs: list[ImagePairWithIntent]
 
     @staticmethod
     def load(
         json_path: str,
         images_path: str,
         splits: set[str] = {"train", "val"},
-    ) -> "ImagePairs":
+    ) -> ImagePairs:
         """
         Loads a list of pairs of images with intents from the given JSON file
         and images.
@@ -592,9 +617,9 @@ class ImagePairs(BaseModel):
         self,
         augment_function: Callable,
         *,
-        augmenter_name: Optional[str] = None,
+        augmenter_name: str | None = None,
         **kwargs,
-    ) -> "AugmentedImagePairs":
+    ) -> AugmentedImagePairs:
         """
         Augments the image pairs with the given augmentation function.
 
@@ -665,17 +690,20 @@ class AugmentedImagePairs(ImagePairs):
         # add the augmentation name to the filenames
         for pair in self.pairs:
             pair.filename = self.__get_augmented_filename(
-                output_path, pair, overwrite
+                output_path,
+                pair,
+                overwrite,
             )
 
         # normalize the augmented data
         captions = Captions.normalize_dict(
-            {"images": [pair.intent.model_dump() for pair in self.pairs]}
+            {"images": [pair.intent.model_dump() for pair in self.pairs]},
         )
 
         # get the path of the json file
         json_path = os.path.join(
-            output_path, self.__get_json_filename(output_path, overwrite)
+            output_path,
+            self.__get_json_filename(output_path, overwrite),
         )
 
         if make_dirs:
@@ -698,7 +726,7 @@ class AugmentedImagePairs(ImagePairs):
             )
         print(
             f"{len(self.pairs)} {self.augmenter_name!r} augmented image pairs "
-            f"saved to {output_path}"
+            f"saved to {output_path}",
         )
 
     def __get_augmented_filename(
@@ -709,7 +737,7 @@ class AugmentedImagePairs(ImagePairs):
     ) -> str:
         old_filename = pair.filename
         old_filename_root, old_filename_extension = os.path.splitext(
-            old_filename
+            old_filename,
         )
 
         # create a new filename with the augmenter name
@@ -726,7 +754,9 @@ class AugmentedImagePairs(ImagePairs):
         while any(
             os.path.exists(image_path)
             for image_path in Image.get_paths_for_pair_of_images(
-                output_path, pair.split, new_filename
+                output_path,
+                pair.split,
+                new_filename,
             )
         ):
             # if it does, add a counter to the filename
@@ -739,7 +769,9 @@ class AugmentedImagePairs(ImagePairs):
         return new_filename
 
     def __get_json_filename(
-        self, output_path: str, overwrite: bool = False
+        self,
+        output_path: str,
+        overwrite: bool = False,
     ) -> str:
         json_filename = f"{self.augmenter_name}.json"
 

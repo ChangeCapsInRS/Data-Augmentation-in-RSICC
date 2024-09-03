@@ -1,26 +1,26 @@
+from __future__ import annotations
+
 import functools
 import os
-from typing import Callable, List
+from collections.abc import Callable
 
 import cv2 as cv
 import numpy as np
 import pytest
 from PIL import Image
 
-from src.augmentation_methods import (
-    BOTTOM_DIRECTIONS,
-    TOP_DIRECTIONS,
-    blur,
-    brighten_after,
-    brighten_before,
-    brighten_both,
-    horizontal_mirror,
-    left_diagonal_mirror,
-    rotate_90,
-    rotate_180,
-    rotate_270,
-    vertical_mirror,
-)
+from src.augmentation_methods import blur
+from src.augmentation_methods import BOTTOM_DIRECTIONS
+from src.augmentation_methods import brighten_after
+from src.augmentation_methods import brighten_before
+from src.augmentation_methods import brighten_both
+from src.augmentation_methods import horizontal_mirror
+from src.augmentation_methods import left_diagonal_mirror
+from src.augmentation_methods import rotate_180
+from src.augmentation_methods import rotate_270
+from src.augmentation_methods import rotate_90
+from src.augmentation_methods import TOP_DIRECTIONS
+from src.augmentation_methods import vertical_mirror
 
 #######################
 #                     #
@@ -60,37 +60,37 @@ class BaselineImageLoader:
 
     def get_brightened_image(self) -> cv.typing.MatLike:
         return self.load_image_from_folder_path(
-            self.get_brightened_image_name()
+            self.get_brightened_image_name(),
         )
 
     def get_horizontal_mirrored_image(self) -> cv.typing.MatLike:
         return self.load_image_from_folder_path(
-            self.get_horizontal_mirrored_image_name()
+            self.get_horizontal_mirrored_image_name(),
         )
 
     def get_vertical_mirrored_image(self) -> cv.typing.MatLike:
         return self.load_image_from_folder_path(
-            self.get_vertical_mirrored_image_name()
+            self.get_vertical_mirrored_image_name(),
         )
 
     def get_left_diagonal_mirrored_image(self) -> cv.typing.MatLike:
         return self.load_image_from_folder_path(
-            self.get_left_diagonal_mirrored_image_name()
+            self.get_left_diagonal_mirrored_image_name(),
         )
 
     def get_rotated_90_image(self) -> cv.typing.MatLike:
         return self.load_image_from_folder_path(
-            self.get_rotated_90_image_name()
+            self.get_rotated_90_image_name(),
         )
 
     def get_rotated_180_image(self) -> cv.typing.MatLike:
         return self.load_image_from_folder_path(
-            self.get_rotated_180_image_name()
+            self.get_rotated_180_image_name(),
         )
 
     def get_rotated_270_image(self) -> cv.typing.MatLike:
         return self.load_image_from_folder_path(
-            self.get_rotated_270_image_name()
+            self.get_rotated_270_image_name(),
         )
 
     @staticmethod
@@ -131,7 +131,7 @@ class BaselineImageLoader:
 
 
 baseline_image_loaders = [
-    BaselineImageLoader("tests/baseline_images/happy_dog")
+    BaselineImageLoader("tests/baseline_images/happy_dog"),
 ]
 
 
@@ -219,7 +219,7 @@ def compare_images_equal(img1: Image.Image, img2: Image.Image) -> None:
 
     sum_sq_diff = np.sum(
         (np.asarray(img1).astype("float") - np.asarray(img2).astype("float"))
-        ** 2
+        ** 2,
     )
 
     if sum_sq_diff == 0:
@@ -231,7 +231,8 @@ def compare_images_equal(img1: Image.Image, img2: Image.Image) -> None:
 
 
 def check_two_lists_of_strings_equal(
-    candidates: List[str], references: List[str]
+    candidates: list[str],
+    references: list[str],
 ) -> None:
     for candidate_string, reference_string in zip(candidates, references):
         assert candidate_string == reference_string
@@ -256,7 +257,9 @@ def augment_single_image_and_check_before_and_after_results(
         AssertionError: If the before and after images are not as expected.
     """
     before_image, after_image, _ = aug_method(
-        base_image, base_image, ["some sentence"]
+        base_image,
+        base_image,
+        ["some sentence"],
     )
 
     assert_images_equal(before_image, after_image)
@@ -276,10 +279,13 @@ def augment_single_image_and_check_before_and_after_results(
     zip(get_base_images(), get_rotated_90_images()),
 )
 def test_rotate_90_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     augment_single_image_and_check_before_and_after_results(
-        rotate_90, base_image, expected_image
+        rotate_90,
+        base_image,
+        expected_image,
     )
 
 
@@ -288,10 +294,13 @@ def test_rotate_90_image_transformations(
     zip(get_base_images(), get_rotated_180_images()),
 )
 def test_rotate_180_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     augment_single_image_and_check_before_and_after_results(
-        rotate_180, base_image, expected_image
+        rotate_180,
+        base_image,
+        expected_image,
     )
 
 
@@ -300,10 +309,13 @@ def test_rotate_180_image_transformations(
     zip(get_base_images(), get_rotated_270_images()),
 )
 def test_rotate_270_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     augment_single_image_and_check_before_and_after_results(
-        rotate_270, base_image, expected_image
+        rotate_270,
+        base_image,
+        expected_image,
     )
 
 
@@ -312,10 +324,13 @@ def test_rotate_270_image_transformations(
     zip(get_base_images(), get_blurred_images()),
 )
 def test_blur_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     augment_single_image_and_check_before_and_after_results(
-        blur, base_image, expected_image
+        blur,
+        base_image,
+        expected_image,
     )
 
 
@@ -324,10 +339,13 @@ def test_blur_image_transformations(
     zip(get_base_images(), get_brightened_images()),
 )
 def test_brighten_both_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     augment_single_image_and_check_before_and_after_results(
-        brighten_both, base_image, expected_image
+        brighten_both,
+        base_image,
+        expected_image,
     )
 
 
@@ -336,16 +354,21 @@ def test_brighten_both_image_transformations(
     zip(get_base_images(), get_brightened_images()),
 )
 def test_brighten_before_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     before_image, after_image, _ = brighten_before(
-        base_image, base_image, ["some sentence"]
+        base_image,
+        base_image,
+        ["some sentence"],
     )
     assert_images_equal(
-        before_image, expected_image
+        before_image,
+        expected_image,
     )  # Brighten before should change the before image
     assert_images_equal(
-        after_image, base_image
+        after_image,
+        base_image,
     )  # Brighten before should not change the after image
 
 
@@ -354,17 +377,22 @@ def test_brighten_before_image_transformations(
     zip(get_base_images(), get_brightened_images()),
 )
 def test_brighten_after_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     before_image, after_image, _ = brighten_after(
-        base_image, base_image, ["some sentence"]
+        base_image,
+        base_image,
+        ["some sentence"],
     )
 
     assert_images_equal(
-        before_image, base_image
+        before_image,
+        base_image,
     )  # Brighten after should not change the before image
     assert_images_equal(
-        after_image, expected_image
+        after_image,
+        expected_image,
     )  # Brighten after should change the after image
 
 
@@ -373,10 +401,13 @@ def test_brighten_after_image_transformations(
     zip(get_base_images(), get_horizontal_mirrored_images()),
 )
 def test_horizontal_mirror_images_augmentation(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     augment_single_image_and_check_before_and_after_results(
-        horizontal_mirror, base_image, expected_image
+        horizontal_mirror,
+        base_image,
+        expected_image,
     )
 
 
@@ -385,10 +416,13 @@ def test_horizontal_mirror_images_augmentation(
     zip(get_base_images(), get_vertical_mirrored_images()),
 )
 def test_vertical_mirror_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     augment_single_image_and_check_before_and_after_results(
-        vertical_mirror, base_image, expected_image
+        vertical_mirror,
+        base_image,
+        expected_image,
     )
 
 
@@ -397,16 +431,20 @@ def test_vertical_mirror_image_transformations(
     zip(get_base_images(), get_left_diagonal_mirrored_images()),
 )
 def test_left_diagonal_mirror_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     augment_single_image_and_check_before_and_after_results(
-        left_diagonal_mirror, base_image, expected_image
+        left_diagonal_mirror,
+        base_image,
+        expected_image,
     )
 
 
 @pytest.mark.skip("Not implemented yet")
 def test_random_augment_image_transformations(
-    base_image: cv.typing.MatLike, expected_image: cv.typing.MatLike
+    base_image: cv.typing.MatLike,
+    expected_image: cv.typing.MatLike,
 ) -> None:
     raise NotImplementedError("Test not implemented yet")
 
@@ -449,10 +487,14 @@ def right_direction(request):
         "top left",
         "bottom right",
         "bottom left",
-    )
+    ),
 )
 def rotate_90_text_transformation(
-    request, top_direction, right_direction, bottom_direction, left_direction
+    request,
+    top_direction,
+    right_direction,
+    bottom_direction,
+    left_direction,
 ):
     if request.param == "top":
         return top_direction, "right"
@@ -496,10 +538,14 @@ def rotate_90_text_transformation(
         "top left",
         "bottom right",
         "bottom left",
-    )
+    ),
 )
 def rotate_180_text_transformation(
-    request, top_direction, right_direction, bottom_direction, left_direction
+    request,
+    top_direction,
+    right_direction,
+    bottom_direction,
+    left_direction,
 ):
     if request.param == "top":
         return top_direction, "bottom"
@@ -543,10 +589,14 @@ def rotate_180_text_transformation(
         "top left",
         "bottom right",
         "bottom left",
-    )
+    ),
 )
 def rotate_270_text_transformation(
-    request, top_direction, right_direction, bottom_direction, left_direction
+    request,
+    top_direction,
+    right_direction,
+    bottom_direction,
+    left_direction,
 ):
     if request.param == "top":
         return top_direction, "left"
@@ -590,10 +640,14 @@ def rotate_270_text_transformation(
         "top left",
         "bottom right",
         "bottom left",
-    )
+    ),
 )
 def horizontal_mirror_text_transformation(
-    request, top_direction, right_direction, bottom_direction, left_direction
+    request,
+    top_direction,
+    right_direction,
+    bottom_direction,
+    left_direction,
 ):
     if request.param == "top":
         return top_direction, top_direction
@@ -637,10 +691,14 @@ def horizontal_mirror_text_transformation(
         "top left",
         "bottom right",
         "bottom left",
-    )
+    ),
 )
 def vertical_mirror_text_transformation(
-    request, top_direction, right_direction, bottom_direction, left_direction
+    request,
+    top_direction,
+    right_direction,
+    bottom_direction,
+    left_direction,
 ):
     if request.param == "top":
         return top_direction, "bottom"
@@ -684,10 +742,14 @@ def vertical_mirror_text_transformation(
         "top left",
         "bottom right",
         "bottom left",
-    )
+    ),
 )
 def left_diagonal_mirror_text_transformation(
-    request, top_direction, right_direction, bottom_direction, left_direction
+    request,
+    top_direction,
+    right_direction,
+    bottom_direction,
+    left_direction,
 ):
     if request.param == "top":
         return top_direction, "left"
@@ -722,12 +784,15 @@ def left_diagonal_mirror_text_transformation(
 
 
 def test_rotate_90_text_transformations_on_single_direction(
-    dummy_image: np.ndarray, rotate_90_text_transformation
+    dummy_image: np.ndarray,
+    rotate_90_text_transformation,
 ) -> None:
     original_direction, expected_direction = rotate_90_text_transformation
 
     _, _, augmented_sentences = rotate_90(
-        dummy_image, dummy_image, [original_direction]
+        dummy_image,
+        dummy_image,
+        [original_direction],
     )
 
     # Check if the augmented sentences are as expected
@@ -735,12 +800,15 @@ def test_rotate_90_text_transformations_on_single_direction(
 
 
 def test_rotate_180_text_transformations_on_single_direction(
-    dummy_image: np.ndarray, rotate_180_text_transformation
+    dummy_image: np.ndarray,
+    rotate_180_text_transformation,
 ) -> None:
     original_direction, expected_direction = rotate_180_text_transformation
 
     _, _, augmented_sentences = rotate_180(
-        dummy_image, dummy_image, [original_direction]
+        dummy_image,
+        dummy_image,
+        [original_direction],
     )
 
     # Check if the augmented sentences are as expected
@@ -748,12 +816,15 @@ def test_rotate_180_text_transformations_on_single_direction(
 
 
 def test_rotate_270_text_transformations_on_single_direction(
-    dummy_image: np.ndarray, rotate_270_text_transformation
+    dummy_image: np.ndarray,
+    rotate_270_text_transformation,
 ) -> None:
     original_direction, expected_direction = rotate_270_text_transformation
 
     _, _, augmented_sentences = rotate_270(
-        dummy_image, dummy_image, [original_direction]
+        dummy_image,
+        dummy_image,
+        [original_direction],
     )
 
     # Check if the augmented sentences are as expected
@@ -761,14 +832,17 @@ def test_rotate_270_text_transformations_on_single_direction(
 
 
 def test_horizontal_mirror_text_transformations_on_single_direction(
-    dummy_image: np.ndarray, horizontal_mirror_text_transformation
+    dummy_image: np.ndarray,
+    horizontal_mirror_text_transformation,
 ) -> None:
     original_direction, expected_direction = (
         horizontal_mirror_text_transformation
     )
 
     _, _, augmented_sentences = horizontal_mirror(
-        dummy_image, dummy_image, [original_direction]
+        dummy_image,
+        dummy_image,
+        [original_direction],
     )
 
     # Check if the augmented sentences are as expected
@@ -776,14 +850,17 @@ def test_horizontal_mirror_text_transformations_on_single_direction(
 
 
 def test_vertical_mirror_text_transformations_on_single_direction(
-    dummy_image: np.ndarray, vertical_mirror_text_transformation
+    dummy_image: np.ndarray,
+    vertical_mirror_text_transformation,
 ) -> None:
     original_direction, expected_direction = (
         vertical_mirror_text_transformation
     )
 
     _, _, augmented_sentences = vertical_mirror(
-        dummy_image, dummy_image, [original_direction]
+        dummy_image,
+        dummy_image,
+        [original_direction],
     )
 
     # Check if the augmented sentences are as expected
@@ -791,14 +868,17 @@ def test_vertical_mirror_text_transformations_on_single_direction(
 
 
 def test_left_diagonal_mirror_text_transformations_on_single_direction(
-    dummy_image: np.ndarray, left_diagonal_mirror_text_transformation
+    dummy_image: np.ndarray,
+    left_diagonal_mirror_text_transformation,
 ) -> None:
     original_direction, expected_direction = (
         left_diagonal_mirror_text_transformation
     )
 
     _, _, augmented_sentences = left_diagonal_mirror(
-        dummy_image, dummy_image, [original_direction]
+        dummy_image,
+        dummy_image,
+        [original_direction],
     )
 
     # Check if the augmented sentences are as expected

@@ -4,6 +4,7 @@ The augmented images and captions are saved in the output folder.
 The original images and captions are also copied to the output folder.
 The augmented JSON files are merged into a single JSON file.
 """
+from __future__ import annotations
 
 import argparse
 import os
@@ -11,7 +12,7 @@ import random
 import shutil
 import sys
 from argparse import Namespace
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from src.augmentation_methods import METHOD_NAME_TO_FUNCTION
 from src.merge import Merger
@@ -35,7 +36,7 @@ def get_inputs(
     return pydantic_pairs, vocab
 
 
-def get_args(argv: Optional[Sequence[str]] = None) -> Namespace:
+def get_args(argv: Sequence[str] | None = None) -> Namespace:
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -117,7 +118,7 @@ def copy_original_files(images_directory, json_path, output_folder):
     )
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     # set random seed
     random.seed(RANDOM_SEED)
 
@@ -149,7 +150,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     # copy original files to output folder
     print("Copying original files to output folder...")
     copy_original_files(
-        args.images_directory, args.json_path, args.output_folder
+        args.images_directory,
+        args.json_path,
+        args.output_folder,
     )
 
     # merge the augmented json files

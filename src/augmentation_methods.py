@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 import copy
-from typing import Callable, List, Literal, Sequence, Tuple
+from collections.abc import Callable
+from collections.abc import Sequence
+from typing import Literal
 
 import cv2 as cv
 import numpy as np
@@ -29,7 +33,7 @@ def vertical_mirror(
     after_image: np.ndarray,
     raw_sentences: Sequence[str],
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     def augment_images():
         horizontal_mirrored_before_image = np.flip(before_image, axis=0)
         horizontal_mirrored_after_image = np.flip(after_image, axis=0)
@@ -62,7 +66,7 @@ def horizontal_mirror(
     after_image: np.ndarray,
     raw_sentences: Sequence[str],
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     def augment_images():
         vertical_mirrored_before_image = np.flip(before_image, axis=1)
         vertical_mirrored_after_image = np.flip(after_image, axis=1)
@@ -92,7 +96,7 @@ def left_diagonal_mirror(
     after_image: np.ndarray,
     raw_sentences: Sequence[str],
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     def augment_images():
         left_diagonal_mirrored_before_image = cv.transpose(before_image)
         left_diagonal_mirrored_after_image = cv.transpose(after_image)
@@ -162,14 +166,18 @@ def blur(
     after_image: np.ndarray,
     raw_sentences: Sequence[str],
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     def augment_images():
         kernel_size = 5
         blurred_before_image = cv.GaussianBlur(
-            before_image, (kernel_size, kernel_size), 0
+            before_image,
+            (kernel_size, kernel_size),
+            0,
         )
         blurred_after_image = cv.GaussianBlur(
-            after_image, (kernel_size, kernel_size), 0
+            after_image,
+            (kernel_size, kernel_size),
+            0,
         )
 
         return blurred_before_image, blurred_after_image
@@ -353,10 +361,12 @@ def rotate(
             270: cv.ROTATE_90_COUNTERCLOCKWISE,
         }
         rotated_before_image = cv.rotate(
-            before_image, degree_to_opencv_values[degree]
+            before_image,
+            degree_to_opencv_values[degree],
         )
         rotated_after_image = cv.rotate(
-            after_image, degree_to_opencv_values[degree]
+            after_image,
+            degree_to_opencv_values[degree],
         )
         return rotated_before_image, rotated_after_image
 
@@ -377,7 +387,7 @@ def rotate_90(
     after_image: np.ndarray,
     raw_sentences: Sequence[str],
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     return rotate(before_image, after_image, raw_sentences, degree=90)
 
 
@@ -386,7 +396,7 @@ def rotate_180(
     after_image: np.ndarray,
     raw_sentences: Sequence[str],
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     return rotate(before_image, after_image, raw_sentences, degree=180)
 
 
@@ -395,7 +405,7 @@ def rotate_270(
     after_image: np.ndarray,
     raw_sentences: Sequence[str],
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     return rotate(before_image, after_image, raw_sentences, degree=270)
 
 
@@ -407,15 +417,19 @@ def brighten_both(
     alpha=1.0,
     beta=80,
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     def augment_images():
         # new_pixel = ALPHA * old_pixel + BETA
 
         before_augmented = cv.convertScaleAbs(
-            before_image, alpha=alpha, beta=beta
+            before_image,
+            alpha=alpha,
+            beta=beta,
         )
         after_augmented = cv.convertScaleAbs(
-            after_image, alpha=alpha, beta=beta
+            after_image,
+            alpha=alpha,
+            beta=beta,
         )
 
         return before_augmented, after_augmented
@@ -435,12 +449,14 @@ def brighten_before(
     alpha: float = 1.0,
     beta: float = 80.0,
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     def augment_images():
         # new_pixel = ALPHA * old_pixel + BETA
 
         before_augmented = cv.convertScaleAbs(
-            before_image, alpha=alpha, beta=beta
+            before_image,
+            alpha=alpha,
+            beta=beta,
         )
 
         return before_augmented, after_image
@@ -460,12 +476,14 @@ def brighten_after(
     alpha: float = 1.0,
     beta: float = 80.0,
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     def augment_images():
         # new_pixel = ALPHA * old_pixel + BETA
 
         after_augmented = cv.convertScaleAbs(
-            after_image, alpha=alpha, beta=beta
+            after_image,
+            alpha=alpha,
+            beta=beta,
         )
 
         return before_image, after_augmented
@@ -482,7 +500,7 @@ def random_augment(
     after_image: np.ndarray,
     raw_sentences: Sequence[str],
     **kwargs,
-) -> tuple[np.ndarray, np.ndarray, List[str]]:
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
     augmenters = [
         [[horizontal_mirror]],
         [[vertical_mirror]],
@@ -491,17 +509,18 @@ def random_augment(
     ]
 
     random_augmenter = RandomAugmenter(
-        augmenters, vocab=kwargs.get("vocab", set())
+        augmenters,
+        vocab=kwargs.get("vocab", set()),
     )
     return random_augmenter.augment(before_image, after_image, raw_sentences)
 
 
 # Only change this when new augmentation method is implemented,
 # do not delete or comment out working methods
-AUGMENTATION_METHODS: List[
+AUGMENTATION_METHODS: list[
     Callable[
         [np.ndarray, np.ndarray, Sequence[str]],
-        Tuple[np.ndarray, np.ndarray, Sequence[str]],
+        tuple[np.ndarray, np.ndarray, Sequence[str]],
     ]
 ] = [
     horizontal_mirror,

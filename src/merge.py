@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -37,7 +39,7 @@ class Merger:
         self.merged_images = []
 
     def add_file_string(self, file_path):
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             file_string = f.read()
             dictionary = json.loads(file_string)
 
@@ -52,13 +54,14 @@ class Merger:
 
             if file_name.endswith(Merger.file_extension):
                 file_path = os.path.join(
-                    self.args.input_directory_path, file_name
+                    self.args.input_directory_path,
+                    file_name,
                 )
                 self.add_file_string(file_path)
 
         # normalize the merged images
         normalized_captions = Captions.normalize_dict(
-            {"images": self.merged_images}
+            {"images": self.merged_images},
         )
 
         self.merged_images = normalized_captions.model_dump()["images"]

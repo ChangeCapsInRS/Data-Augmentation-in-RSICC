@@ -115,7 +115,7 @@ $\mathrm{hybrid}$: `random_augment`
 <details>
 <summary>Custom Directional Phrases</summary>
 
-This section focuses on multimodal data augmentation techniques that utilize directional phrases such as "left," "right," "top," and "bottom," along with their combinations, to align captions with their corresponding image pairs. 
+This section focuses on multimodal data augmentation techniques that utilize directional phrases such as "left," "right," "top," and "bottom," along with their combinations, to align captions with their corresponding image pairs.
 
 In some datasets, the areas corresponding to the top and bottom of the image frame may be referred to using various terms. For example, "top" can also be described as "upper," "above," "higher," while "bottom" may be referred to as "lower," "below," "bottommost," or "lowest." To accommodate these variations, you can modify the definitions of the `BOTTOM_DIRECTIONS` and `TOP_DIRECTIONS` constants in the [augmentation_methods.py](src/augmentation_methods.py) file:
 
@@ -131,7 +131,7 @@ In some datasets, the areas corresponding to the top and bottom of the image fra
 +    "bottommost",
 +    "lowest",
  )
- 
+
  TOP_DIRECTIONS = (
      "top",
 -    # "upper",

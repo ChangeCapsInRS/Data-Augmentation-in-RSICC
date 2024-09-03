@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import random
+from collections.abc import Callable
+from collections.abc import Sequence
 from copy import deepcopy
-from typing import Callable, List, Sequence
 
 import numpy as np
 
@@ -8,7 +11,7 @@ import numpy as np
 class RandomAugmenter:
     def __init__(
         self,
-        augmenter_list: List[List[List[Callable]]],
+        augmenter_list: list[list[list[Callable]]],
         **kwargs,
     ) -> None:
         self.AUGMENTERS = augmenter_list
@@ -47,7 +50,7 @@ class RandomAugmenter:
         after_image: np.ndarray,
         raw_sentences: Sequence[str],
         augmenters: Sequence[Callable],
-    ) -> tuple[np.ndarray, np.ndarray, List[str]]:
+    ) -> tuple[np.ndarray, np.ndarray, list[str]]:
         augmented_pair = {
             "before": deepcopy(before_image),
             "after": deepcopy(after_image),
@@ -77,13 +80,17 @@ class RandomAugmenter:
         self.__shuffle(shuffled_augmenters)
 
         shuffled_augmenters = self.__extract_subset(
-            shuffled_augmenters, subset_size=random.randint(1, 2)
+            shuffled_augmenters,
+            subset_size=random.randint(1, 2),
         )
 
         self.__print_shuffled_augmenters(shuffled_augmenters)
 
         return self.__apply_augmenters(
-            before_image, after_image, raw_sentences, shuffled_augmenters
+            before_image,
+            after_image,
+            raw_sentences,
+            shuffled_augmenters,
         )
 
     def augment(
@@ -91,12 +98,15 @@ class RandomAugmenter:
         before_image: np.ndarray,
         after_image: np.ndarray,
         raw_sentences: Sequence[str],
-    ) -> tuple[np.ndarray, np.ndarray, List[str]]:
+    ) -> tuple[np.ndarray, np.ndarray, list[str]]:
         shuffled_augmenters = self.__select_from_categories()
         self.__shuffle(shuffled_augmenters)
         subset_size = random.randint(1, self.N_AUGMENTER)
         shuffled_augmenters = shuffled_augmenters[:subset_size]
         self.__print_shuffled_augmenters(shuffled_augmenters)
         return self.__apply_augmenters(
-            before_image, after_image, raw_sentences, shuffled_augmenters
+            before_image,
+            after_image,
+            raw_sentences,
+            shuffled_augmenters,
         )

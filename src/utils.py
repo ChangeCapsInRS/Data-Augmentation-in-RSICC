@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 
@@ -15,7 +17,7 @@ def normalize_sentence(sentence: str) -> str:
 
     # remove punctuation from the sentence
     sentence_without_punctuation = remove_punctuation(
-        lower_cased_and_stripped_sentence
+        lower_cased_and_stripped_sentence,
     )
 
     # remove any extra spaces
