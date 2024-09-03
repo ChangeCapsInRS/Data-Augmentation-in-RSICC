@@ -8,6 +8,8 @@ import pytest
 from PIL import Image
 
 from src.augmentation_methods import (
+    BOTTOM_DIRECTIONS,
+    TOP_DIRECTIONS,
     blur,
     brighten_after,
     brighten_before,
@@ -417,29 +419,12 @@ def test_random_augment_image_transformations(
 ###########################
 
 
-@pytest.fixture(
-    params=(
-        "bottom",
-        # "lower",
-        # "below",
-        # "bottommost",
-        # "lowest",
-    )
-)
+@pytest.fixture(params=BOTTOM_DIRECTIONS)
 def bottom_direction(request):
     return request.param
 
 
-@pytest.fixture(
-    params=(
-        "top",
-        # "upper",
-        # "above",
-        # "topmost",
-        # "highest",
-        # "higher",
-    )
-)
+@pytest.fixture(params=TOP_DIRECTIONS)
 def top_direction(request):
     return request.param
 
