@@ -181,6 +181,8 @@ def main():
                 split = "val"
             elif image_id in test_split_ids:
                 split = "test"
+            else:
+                raise ValueError("Invalid image id")
             output_file_name = file_name[:-6] + file_name[-4:]
             source_path = os.path.join(TEMPORARY_DIRECTORY, file_name)
             destination_path = os.path.join(
@@ -202,7 +204,7 @@ def main():
             elif image_id in test_split_ids:
                 correct_split = "test"
             else:
-                assert 1 == 0
+                raise ValueError("Invalid image id")
             image["filepath"] = correct_split
             image["split"] = correct_split
 
