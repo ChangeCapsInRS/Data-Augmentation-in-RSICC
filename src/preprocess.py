@@ -4,10 +4,10 @@ This script is used to preprocess the captions in the JSON file.
 from __future__ import annotations
 
 import argparse
-import os
 import json
-import shutil
+import os
 import random
+import shutil
 
 from src.schemas import Captions
 
@@ -65,7 +65,9 @@ def main():
     arguments = parser.parse_args()
 
     assert (
-        arguments.train_amount + arguments.validation_amount + arguments.test_amount
+        arguments.train_amount
+        + arguments.validation_amount
+        + arguments.test_amount
         == 100
     )
 
@@ -119,28 +121,37 @@ def main():
                     )
                     shutil.copyfile(
                         file_name_path,
-                        os.path.join(TEMPORARY_DIRECTORY, file_name_with_time_state),
+                        os.path.join(
+                            TEMPORARY_DIRECTORY,
+                            file_name_with_time_state,
+                        ),
                     )
 
         image_ids = list(set(image_ids))
         random.shuffle(image_ids)
         image_count = len(image_ids)
         train_split_size = int(image_count * arguments.train_amount / 100)
-        validation_split_size = int(image_count * arguments.validation_amount / 100)
+        validation_split_size = int(
+            image_count * arguments.validation_amount / 100,
+        )
         test_split_size = int(image_count * arguments.test_amount / 100)
         test_split_size += (
-            image_count - train_split_size - validation_split_size - test_split_size
+            image_count
+            - train_split_size
+            - validation_split_size
+            - test_split_size
         )
         train_split_ids = image_ids[:train_split_size]
         validation_split_ids = image_ids[
-            train_split_size : train_split_size + validation_split_size
+            train_split_size: train_split_size + validation_split_size
         ]
-        test_split_ids = image_ids[train_split_size + validation_split_size :]
+        test_split_ids = image_ids[train_split_size + validation_split_size:]
 
         # Write image files from the temporary directory to the output
         # directory according to the determined split
         images_directory = os.path.join(
-            arguments.output, os.path.basename(arguments.images)
+            arguments.output,
+            os.path.basename(arguments.images),
         )
         os.makedirs(
             images_directory,
@@ -153,10 +164,12 @@ def main():
                 exist_ok=True,
             )
             os.makedirs(
-                os.path.join(images_directory, split, BEFORE_IMAGE_LABEL), exist_ok=True
+                os.path.join(images_directory, split, BEFORE_IMAGE_LABEL),
+                exist_ok=True,
             )
             os.makedirs(
-                os.path.join(images_directory, split, AFTER_IMAGE_LABEL), exist_ok=True
+                os.path.join(images_directory, split, AFTER_IMAGE_LABEL),
+                exist_ok=True,
             )
 
         for file_name in os.listdir(TEMPORARY_DIRECTORY):
@@ -196,13 +209,24 @@ def main():
         shutil.copyfile(
             arguments.fixed_words,
             os.path.join(
-                os.path.join(arguments.output, os.path.basename(arguments.fixed_words))
+                os.path.join(
+                    arguments.output,
+                    os.path.basename(
+                        arguments.fixed_words,
+                    ),
+                ),
             ),
         )
 
     # write the validated content to the output file
     with open(
-        os.path.join(arguments.output, os.path.basename(arguments.captions)), "w"
+        os.path.join(
+            arguments.output,
+            os.path.basename(
+                arguments.captions,
+            ),
+        ),
+        "w",
     ) as f:
         f.write(json.dumps(captions, indent=4))
 
