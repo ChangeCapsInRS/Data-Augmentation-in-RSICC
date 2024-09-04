@@ -31,11 +31,6 @@ def main():
         help="Path to the images directory",
     )
     parser.add_argument(
-        "--fixed_words",
-        required=False,
-        help="Path to the fixed words file",
-    )
-    parser.add_argument(
         "--train_amount",
         type=int,
         help="Percentage of train split",
@@ -72,14 +67,6 @@ def main():
 
     os.makedirs(arguments.output, exist_ok=True)
     split_names = os.listdir(arguments.images)
-
-    for image in captions["images"]:
-        image["filename"] = (
-            image["filename"]
-            .replace("train_", "")
-            .replace("val_", "")
-            .replace("test_", "")
-        )
 
     os.makedirs(TEMPORARY_DIRECTORY, exist_ok=True)
     image_ids = []
@@ -201,18 +188,6 @@ def main():
             raise ValueError("Invalid image id")
         image["filepath"] = correct_split
         image["split"] = correct_split
-
-    shutil.copyfile(
-        arguments.fixed_words,
-        os.path.join(
-            os.path.join(
-                arguments.output,
-                os.path.basename(
-                    arguments.fixed_words,
-                ),
-            ),
-        ),
-    )
 
     # write the validated content to the output file
     with open(
