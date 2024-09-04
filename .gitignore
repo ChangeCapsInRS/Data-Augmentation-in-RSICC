@@ -1,3 +1,6 @@
+# Ignore LEVIR-CC dataset folder
+Levir-CC-dataset/
+
 # Ignore API key
 google_ai_api_key
 
