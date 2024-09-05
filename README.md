@@ -42,7 +42,7 @@ The augmentation pipeline in this repository is implemented with the LEVIR-CC da
 In the paper, we operate on a resplit and preprocessed version of the LEVIR-CC dataset. To achieve the same effect:
 
 ```bash
-python -m src.preprocess --captions Levir-CC-dataset/LevirCCcaptions.json --images Levir-CC-dataset/images \
+python -m src.preprocess --captions path/to/captions.json --images path/to/images \
     --train_amount 25 --validation_amount 25 --test_amount 50 --output levircc_25_25_50
 ```
 
