@@ -167,17 +167,17 @@ def main():
         output_file_name = file_name[:-6] + file_name[-4:]
         source_path = os.path.join(TEMPORARY_DIRECTORY, file_name)
         destination_path = os.path.join(
-            arguments.images,
+            arguments.output,
+            os.path.basename(arguments.images),
             split,
             time_state,
             output_file_name,
         )
-        print(destination_path)
         shutil.copyfile(source_path, destination_path)
 
     # Splits in the captions file are no longer valid, correct them
     for image in captions["images"]:
-        image_id = image["filename"][:-4]
+        image_id = image["filename"][-10:-4]
         if image_id in train_split_ids:
             correct_split = "train"
         elif image_id in validation_split_ids:
@@ -185,9 +185,10 @@ def main():
         elif image_id in test_split_ids:
             correct_split = "test"
         else:
-            raise ValueError("Invalid image id")
+            raise ValueError(f"Image id does not belong to any split: {image_id}")
         image["filepath"] = correct_split
         image["split"] = correct_split
+        image["filename"] = correct_split + "_" + image_id + ".png"
 
     # write the validated content to the output file
     with open(
