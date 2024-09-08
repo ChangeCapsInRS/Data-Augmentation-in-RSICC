@@ -49,10 +49,10 @@ python -m src.preprocess --captions path/to/captions.json --images path/to/image
 > [!WARNING]
 > Beware that the script used above is really demanding in terms of disk usage.
 
-The command above saves the resulting dataset under `output/dataset` in the following tree directory structure:
+The command above saves the resulting dataset in `./levircc_25_25_50` in the following tree directory structure:
 
 ```tree
-output/dataset
+levircc_25_25_50
             ├─LevirCCcaptions.json
             └─images
               ├─train
