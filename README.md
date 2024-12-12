@@ -182,15 +182,16 @@ If you find this repository or the paper helpful, please consider citing:
 If you find this code useful for your research, please cite
 
 ```
-@ARTICLE{9934924,
-  author={Liu, Chenyang and Zhao, Rui and Chen, Hao and Zou, Zhengxia and Shi, Zhenwei},
-  journal={IEEE Transactions on Geoscience and Remote Sensing}, 
-  title={Remote Sensing Image Change Captioning With Dual-Branch Transformers: A New Method and a Large Scale Dataset}, 
-  year={2022},
-  volume={60},
+@INPROCEEDINGS{10773445,
+  author={Karimli, Orkhan and Mustafazade, Ilyas and Karaca, Ali Can and Amasyalı, Fatih},
+  booktitle={2024 9th International Conference on Computer Science and Engineering (UBMK)}, 
+  title={Data Augmentation in Remote Sensing Image Change Captioning}, 
+  year={2024},
+  volume={},
   number={},
-  pages={1-20},
-  keywords={Feature extraction;Transformers;Task analysis;Remote sensing;Visualization;Semantics;Image recognition;Change captioning (CC);change detection (CD);image captioning;remote sensing (RS) images;Transformer},
-  doi={10.1109/TGRS.2022.3218921}}
+  pages={287-292},
+  keywords={Training;Computer science;Limiting;Diversity reception;Training data;Land surface;Data augmentation;Data models;Sensors;Remote sensing;Data augmentation;change captioning;remote sensing images;Transformer},
+  doi={10.1109/UBMK63289.2024.10773445}}
+
 
 ```
