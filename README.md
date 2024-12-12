@@ -176,3 +176,21 @@ If you find this repository or the paper helpful, please consider citing:
 ...
 ```
  -->
+ 
+# Reference
+
+If you find this code useful for your research, please cite
+
+```
+@ARTICLE{9934924,
+  author={Liu, Chenyang and Zhao, Rui and Chen, Hao and Zou, Zhengxia and Shi, Zhenwei},
+  journal={IEEE Transactions on Geoscience and Remote Sensing}, 
+  title={Remote Sensing Image Change Captioning With Dual-Branch Transformers: A New Method and a Large Scale Dataset}, 
+  year={2022},
+  volume={60},
+  number={},
+  pages={1-20},
+  keywords={Feature extraction;Transformers;Task analysis;Remote sensing;Visualization;Semantics;Image recognition;Change captioning (CC);change detection (CD);image captioning;remote sensing (RS) images;Transformer},
+  doi={10.1109/TGRS.2022.3218921}}
+
+```
