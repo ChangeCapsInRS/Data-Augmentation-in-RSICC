@@ -6,7 +6,7 @@
 
 </div>
 
-This repository contains the implementation of the augmentation methods from the *"Data Augmentation in Remote Sensing Image Change Captioning"* conference paper. For more information, please see our published paper in [[IEEE]([https://ieeexplore.ieee.org/document/9934924](https://ieeexplore.ieee.org/document/9934924))]  ***(in IEEE International Conference on Computer Science and Engineering (UBMK2024))***
+This repository contains the implementation of the augmentation methods from the *"Data Augmentation in Remote Sensing Image Change Captioning"* conference paper. For more information, please see our published paper in [IEEE]([https://ieeexplore.ieee.org/document/9934924](https://ieeexplore.ieee.org/document/9934924))  ***(in IEEE International Conference on Computer Science and Engineering (UBMK2024))***
 
 ![Augmentation Process](Fig.png)
 
