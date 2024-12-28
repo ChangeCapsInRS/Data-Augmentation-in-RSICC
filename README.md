@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1><a href="[https://ieeexplore.ieee.org/document/10773445]">Data Augmentation in Remote Sensing Image Change Captioning</a></h1>
+<h1><a href="https://ieeexplore.ieee.org/document/10773445">Data Augmentation in Remote Sensing Image Change Captioning</a></h1>
 
 **Orkhan Karimli, Ilyas Mustafazade, [Ali Can Karaca](https://scholar.google.com.tr/citations?user=KVU5O6gAAAAJ&hl=tr&authuser=1), and [M. Fatih Amasyali](https://scholar.google.com.tr/citations?hl=tr&authuser=1&user=qTUSAy0AAAAJ)**
 
