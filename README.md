@@ -1,12 +1,12 @@
 <div align="center">
 
-<h1><a href="[https://ieeexplore.ieee.org/document/9934924]">Data Augmentation in Remote Sensing Image Change Captioning</a></h1>
+<h1><a href="[https://ieeexplore.ieee.org/document/10773445]">Data Augmentation in Remote Sensing Image Change Captioning</a></h1>
 
 **Orkhan Karimli, Ilyas Mustafazade, [Ali Can Karaca](https://scholar.google.com.tr/citations?user=KVU5O6gAAAAJ&hl=tr&authuser=1), and [M. Fatih Amasyali](https://scholar.google.com.tr/citations?hl=tr&authuser=1&user=qTUSAy0AAAAJ)**
 
 </div>
 
-This repository contains the implementation of the augmentation methods from the *"Data Augmentation in Remote Sensing Image Change Captioning"* conference paper. For more information, please see our published paper in [https://ieeexplore.ieee.org/document/9934924](https://ieeexplore.ieee.org/document/9934924)  ***(in IEEE International Conference on Computer Science and Engineering (UBMK2024))***
+This repository contains the implementation of the augmentation methods from the *"Data Augmentation in Remote Sensing Image Change Captioning"* conference paper. For more information, please see our published paper in [https://ieeexplore.ieee.org/document/10773445](https://ieeexplore.ieee.org/document/10773445)  ***(in IEEE International Conference on Computer Science and Engineering (UBMK2024))***
 
 ![Augmentation Process](Fig.png)
 
